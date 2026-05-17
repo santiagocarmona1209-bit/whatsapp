@@ -1,0 +1,51 @@
+import express from "express";
+import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys";
+import QRCode from "qrcode";
+
+const app = express();
+
+let latestQR = null;
+
+async function startBot() {
+  const { state, saveCreds } = await useMultiFileAuthState("./auth");
+
+  const sock = makeWASocket({
+    auth: state,
+    printQRInTerminal: false
+  });
+
+  sock.ev.on("creds.update", saveCreds);
+
+  sock.ev.on("connection.update", async (update) => {
+    const { qr } = update;
+
+    if (qr) {
+      latestQR = await QRCode.toDataURL(qr);
+      console.log("QR actualizado");
+    }
+  });
+}
+
+startBot();
+
+app.get("/", (req, res) => {
+  if (!latestQR) return res.send("Esperando QR...");
+
+  res.send(`<img src="${latestQR}" width="300"/>`);
+});
+
+app.listen(process.env.PORT || 3000);
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "@whiskeysockets/baileys": "^6.7.2",
+    "qrcode": "^1.5.3"
+  }
+}
