@@ -36,16 +36,32 @@ app.get("/", (req, res) => {
 
 app.listen(process.env.PORT || 3000);
 {
-  "name": "whatsapp-bot",
+  "name": "bot-whatsapp",
   "version": "1.0.0",
-  "type": "module",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
-    "express": "^4.18.2",
-    "@whiskeysockets/baileys": "^6.7.2",
-    "qrcode": "^1.5.3"
-  }
+    "@whiskeysockets/baileys": "^7.0.0-rc11",
+    "express": "^5.2.1",
+    "nodemailer": "^6.9.13",
+    "puppeteer": "^13.7.0",
+    "qrcode": "^1.5.4",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/santiagocarmona1209-bit/whatsapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/santiagocarmona1209-bit/whatsapp/issues"
+  },
+  "homepage": "https://github.com/santiagocarmona1209-bit/whatsapp#readme"
 }
