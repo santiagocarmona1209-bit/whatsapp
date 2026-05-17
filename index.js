@@ -1,5 +1,8 @@
 import express from "express";
-import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys";
+import pkg from "@whiskeysockets/baileys";
+import QRCode from "qrcode";
+
+const { default: makeWASocket, useMultiFileAuthState } = pkg;
 import QRCode from "qrcode";
 
 const app = express();
