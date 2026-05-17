@@ -3,8 +3,6 @@ import pkg from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
 
 const { default: makeWASocket, useMultiFileAuthState } = pkg;
-import QRCode from "qrcode";
-
 const app = express();
 
 let qrImage = null;
