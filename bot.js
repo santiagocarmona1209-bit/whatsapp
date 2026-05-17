@@ -35,6 +35,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000);
+
 {
   "name": "bot-whatsapp",
   "version": "1.0.0",
