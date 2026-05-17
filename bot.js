@@ -35,8 +35,6 @@ app.get("/", (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000);
-
-
 {
   "name": "bot-whatsapp",
   "version": "1.0.0",
@@ -67,6 +65,9 @@ app.listen(process.env.PORT || 3000);
   },
   "homepage": "https://github.com/santiagocarmona1209-bit/whatsapp#readme"
 }
+
+
+
 {
   "name": "bot-whatsapp",
   "version": "1.0.0",
