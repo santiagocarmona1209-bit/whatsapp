@@ -19,7 +19,6 @@ let qrImage = null;
 // 🔵 BOT WHATSAPP
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./auth");
-
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
@@ -34,31 +33,63 @@ async function startBot() {
 
   sock.ev.on("creds.update", saveCreds);
 
+  // 📡 CONEXIÓN + QR
   sock.ev.on("connection.update", async (update) => {
     const { connection, qr } = update;
 
-    // 📲 generar QR para web
     if (qr) {
       qrImage = await QRCode.toDataURL(qr);
       console.log("QR actualizado");
     }
 
-    // 🔴 reconexión automática
     if (connection === "close") {
       console.log("⚠️ Conexión cerrada, reconectando...");
       startBot();
     }
 
-    // 🟢 conectado
     if (connection === "open") {
       console.log("✅ WhatsApp conectado");
+    }
+  });
+
+  // 💬 MENSAJES + RESPUESTAS
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+    const msg = messages[0];
+
+    if (!msg.message || msg.key.fromMe) return;
+
+    const text =
+      msg.message.conversation ||
+      msg.message.extendedTextMessage?.text;
+
+    if (!text) return;
+
+    const from = msg.key.remoteJid;
+    const msgText = text.toLowerCase();
+
+    if (msgText === "hola") {
+      await sock.sendMessage(from, { text: "👋 Hola! ¿Cómo estás?" });
+    }
+
+    if (msgText === "usuario") {
+      await sock.sendMessage(from, { text: "santiagocarmona1209@gmail.com" });
+    }
+
+    if (msgText === "contrasena") {
+      await sock.sendMessage(from, { text: "$_antiago_1105379489_2011" });
+    }
+
+    if (msgText === "menu") {
+      await sock.sendMessage(from, {
+        text: "📋 Menú:\n- hola\n- ayuda\n- info"
+      });
     }
   });
 }
 
 startBot();
 
-// 🌐 SERVIDOR WEB
+// 🌐 WEB QR
 app.get("/", (req, res) => {
   res.send(`
     <html>
@@ -67,19 +98,13 @@ app.get("/", (req, res) => {
       </head>
       <body style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:Arial;">
         <h2>Escanea el QR</h2>
-
-        ${
-          qrImage
-            ? `<img src="${qrImage}" width="300"/>`
-            : "<p>Esperando QR...</p>"
-        }
-
+        ${qrImage ? `<img src="${qrImage}" width="300"/>` : "<p>Esperando QR...</p>"}
       </body>
     </html>
   `);
 });
 
-// 🚀 START SERVER
+// 🚀 SERVER
 app.listen(process.env.PORT || 3000, () => {
   console.log("Servidor listo");
 });
