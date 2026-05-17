@@ -1,3 +1,8 @@
+import { webcrypto } from "crypto";
+
+if (!globalThis.crypto) {
+  globalThis.crypto = webcrypto;
+}
 import express from "express";
 import pkg from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
