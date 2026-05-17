@@ -25,7 +25,9 @@ async function startBot() {
     version,
     auth: state,
     printQRInTerminal: false,
-    browser: ["Kali Linux", "Chrome", "22.04.4"],
+    browser: ["Ubuntu", "Chrome", "22.04.4"],
+    syncFullHistory: false,
+    markOnlineOnConnect: true,
     connectTimeoutMs: 60000,
     defaultQueryTimeoutMs: 60000,
     retryRequestDelayMs: 2000
@@ -39,22 +41,25 @@ async function startBot() {
 
     if (qr) {
       qrImage = await QRCode.toDataURL(qr);
-      console.log("QR actualizado");
+      console.log("📲 QR actualizado");
+    }
+
+    if (connection === "open") {
+      console.log("✅ WhatsApp conectado");
     }
 
     if (connection === "close") {
       console.log("⚠️ Conexión cerrada, reconectando...");
       startBot();
     }
-
-    if (connection === "open") {
-      console.log("✅ WhatsApp conectado");
-    }
   });
 
-  // 💬 MENSAJES (ARREGLADO)
+  // 💬 MENSAJES (DEBUG + RESPUESTAS)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
+
+    // 🔴 DEBUG CLAVE
+    console.log("🔥 MENSAJE RAW:", JSON.stringify(msg, null, 2));
 
     if (!msg.message || msg.key.fromMe) return;
 
@@ -71,8 +76,9 @@ async function startBot() {
     const from = msg.key.remoteJid;
     const msgText = text.toLowerCase().trim();
 
-    console.log("MENSAJE RECIBIDO:", msgText);
+    console.log("📩 TEXTO:", msgText);
 
+    // 🟢 RESPUESTAS
     if (msgText === "hola") {
       await sock.sendMessage(from, { text: "👋 Hola! ¿Cómo estás?" });
     }
