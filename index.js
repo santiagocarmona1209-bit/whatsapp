@@ -43,8 +43,8 @@ async function startBot() {
   if (connection === "open") {
     console.log("✅ WhatsApp conectado");
   }
- });
-
+});
+}
 startBot();
 
 // 🌐 WEB (HTML)
