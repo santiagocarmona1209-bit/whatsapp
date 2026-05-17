@@ -24,17 +24,15 @@ async function startBot() {
     version,
     auth: state,
     printQRInTerminal: false,
-    browser: ["kali linux", "Chrome", "22.04.4"],
+    browser: ["Ubuntu", "Chrome", "22.04.4"],
     syncFullHistory: false,
     markOnlineOnConnect: true,
-    emitOwnEvents: false,
-    defaultQueryTimeoutMs: 60000,
-    retryRequestDelayMs: 2000
+    emitOwnEvents: false
   });
 
   sock.ev.on("creds.update", saveCreds);
 
-  // 🔵 CONEXIÓN + QR
+  // 🔵 CONEXIÓN
   sock.ev.on("connection.update", async (update) => {
     const { connection, qr } = update;
 
@@ -48,26 +46,22 @@ async function startBot() {
     }
 
     if (connection === "close") {
-      console.log("⚠️ Conexión cerrada, reconectando...");
+      console.log("⚠️ Reconectando...");
       startBot();
     }
   });
 
-  // 💬 MENSAJES (DEBUG REAL)
+  // 💬 MENSAJES (CRÍTICO)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
 
-    console.log("🔥 MENSAJE RAW:", JSON.stringify(msg, null, 2));
+    console.log("🔥 EVENTO MENSAJE LLEGÓ");
 
     if (!msg.message || msg.key.fromMe) return;
 
     const text =
       msg.message.conversation ||
-      msg.message.extendedTextMessage?.text ||
-      msg.message.imageMessage?.caption ||
-      msg.message.videoMessage?.caption ||
-      msg.message.buttonsResponseMessage?.selectedButtonId ||
-      msg.message.listResponseMessage?.singleSelectReply?.selectedRowId;
+      msg.message.extendedTextMessage?.text;
 
     if (!text) return;
 
@@ -76,22 +70,13 @@ async function startBot() {
 
     console.log("📩 TEXTO:", msgText);
 
-    // 🟢 RESPUESTAS
     if (msgText === "hola") {
-      await sock.sendMessage(from, { text: "👋 Hola! ¿Cómo estás?" });
-    }
-
-    if (msgText === "ayuda") {
-      await sock.sendMessage(from, { text: "🛠️ Estoy aquí para ayudarte." });
-    }
-
-    if (msgText === "info") {
-      await sock.sendMessage(from, { text: "🤖 Soy un bot hecho con Node.js y Baileys." });
+      await sock.sendMessage(from, { text: "👋 Hola! Funciono en Render" });
     }
 
     if (msgText === "menu") {
       await sock.sendMessage(from, {
-        text: "📋 Menú:\n- hola\n- ayuda\n- info\n- menu"
+        text: "📋 Menú:\n- hola\n- menu"
       });
     }
   });
@@ -103,10 +88,7 @@ startBot();
 app.get("/", (req, res) => {
   res.send(`
     <html>
-      <head>
-        <title>WhatsApp Bot QR</title>
-      </head>
-      <body style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:Arial;">
+      <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
         <h2>Escanea el QR</h2>
         ${qrImage ? `<img src="${qrImage}" width="300"/>` : "<p>Esperando QR...</p>"}
       </body>
@@ -114,7 +96,6 @@ app.get("/", (req, res) => {
   `);
 });
 
-// 🚀 SERVER
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Servidor listo");
+  console.log("Servidor listo en Render");
 });
