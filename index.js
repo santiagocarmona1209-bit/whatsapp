@@ -52,7 +52,7 @@ async function startBot() {
     }
   });
 
-  // 💬 MENSAJES + RESPUESTAS
+  // 💬 MENSAJES (ARREGLADO)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
 
@@ -60,28 +60,34 @@ async function startBot() {
 
     const text =
       msg.message.conversation ||
-      msg.message.extendedTextMessage?.text;
+      msg.message.extendedTextMessage?.text ||
+      msg.message.imageMessage?.caption ||
+      msg.message.videoMessage?.caption ||
+      msg.message.buttonsResponseMessage?.selectedButtonId ||
+      msg.message.listResponseMessage?.singleSelectReply?.selectedRowId;
 
     if (!text) return;
 
     const from = msg.key.remoteJid;
-    const msgText = text.toLowerCase();
+    const msgText = text.toLowerCase().trim();
+
+    console.log("MENSAJE RECIBIDO:", msgText);
 
     if (msgText === "hola") {
       await sock.sendMessage(from, { text: "👋 Hola! ¿Cómo estás?" });
     }
 
-    if (msgText === "usuario") {
-      await sock.sendMessage(from, { text: "santiagocarmona1209@gmail.com" });
+    if (msgText === "ayuda") {
+      await sock.sendMessage(from, { text: "🛠️ Estoy aquí para ayudarte." });
     }
 
-    if (msgText === "contrasena") {
-      await sock.sendMessage(from, { text: "$_antiago_1105379489_2011" });
+    if (msgText === "info") {
+      await sock.sendMessage(from, { text: "🤖 Soy un bot hecho con Node.js y Baileys." });
     }
 
     if (msgText === "menu") {
       await sock.sendMessage(from, {
-        text: "📋 Menú:\n- hola\n- ayuda\n- info"
+        text: "📋 Menú:\n- hola\n- ayuda\n- info\n- menu"
       });
     }
   });
