@@ -1,100 +1,10 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const puppeteer = require('puppeteer');
-const qrcode = require('qrcode-terminal');
-const nodemailer = require('nodemailer');
-
-const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        executablePath: puppeteer.executablePath(),
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage'
-        ]
-    }
-});
-client.on('qr', qr => {
-    qrcode.generate(qr, { small: true });
-});
-
-client.on('ready', () => {
-    console.log('Bot conectado');
-});
-
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'santiagocarmona1209@gmail.com',
-        pass: 'TU_APP_PASSWORD_AQUI'
-    }
-});
-
-client.on('message_create', async msg => {
-
-    const text = msg.body.toLowerCase();
-
-    console.log(text);
-
-    if (text === '!correo') {
-
-        await transporter.sendMail({
-            from: 'santiagocarmona1209@gmail.com',
-            to: 'santiagocarmona1209@gmail.com',
-            subject: 'Mensaje desde WhatsApp',
-            text: 'Correo enviado desde mi bot'
-        });
-
-        msg.reply('📧 Correo enviado correctamente');
-    }
-
-    if (text === 'usuario') {
-        msg.reply("santiagocarmona1209@gmail.com");
-    }
-
-    if (text === 'contrasena') {
-        msg.reply("$_antiago_1105379489_2011");
-    }
-});
-
-client.initialize();{
-  "name": "bot-whatsapp",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "nodemailer": "^6.9.13",
-    "puppeteer": "^13.7.0",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.23.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/santiagocarmona1209-bit/whatsapp.git"
-  },
-  "bugs": {
-    "url": "https://github.com/santiagocarmona1209-bit/whatsapp/issues"
-  },
-  "homepage": "https://github.com/santiagocarmona1209-bit/whatsapp#readme"
-}
-      
 import express from "express";
 import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys";
 import QRCode from "qrcode";
 
 const app = express();
-
 let latestQR = null;
 
-// WhatsApp bot
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./auth");
 
@@ -109,7 +19,6 @@ async function startBot() {
     const { qr } = update;
 
     if (qr) {
-      // convertimos QR string → imagen base64
       latestQR = await QRCode.toDataURL(qr);
       console.log("QR actualizado");
     }
@@ -118,26 +27,24 @@ async function startBot() {
 
 startBot();
 
-// 🌐 Web server (Render)
 app.get("/", (req, res) => {
-  if (!latestQR) {
-    return res.send("<h2>Esperando QR...</h2>");
+  if (!latestQR) return res.send("Esperando QR...");
+
+  res.send(`<img src="${latestQR}" width="300"/>`);
+});
+
+app.listen(process.env.PORT || 3000);
+{
+  "name": "bot-whatsapp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.0.0",
+    "express": "^4.18.2",
+    "qrcode": "^1.5.3"
   }
-
-  res.send(`
-    <html>
-      <head>
-        <title>WhatsApp QR</title>
-      </head>
-      <body style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;">
-        <h2>Escanea el QR</h2>
-        <img src="${latestQR}" style="width:300px;height:300px;" />
-      </body>
-    </html>
-  `);
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Servidor listo");
-});
- 
+}
