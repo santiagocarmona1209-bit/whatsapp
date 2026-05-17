@@ -16,7 +16,6 @@ const app = express();
 
 let qrImage = null;
 
-// 🔵 BOT WHATSAPP
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./auth");
   const { version } = await fetchLatestBaileysVersion();
@@ -25,17 +24,17 @@ async function startBot() {
     version,
     auth: state,
     printQRInTerminal: false,
-    browser: ["Ubuntu", "Chrome", "22.04.4"],
+    browser: ["kali linux", "Chrome", "22.04.4"],
     syncFullHistory: false,
     markOnlineOnConnect: true,
-    connectTimeoutMs: 60000,
+    emitOwnEvents: false,
     defaultQueryTimeoutMs: 60000,
     retryRequestDelayMs: 2000
   });
 
   sock.ev.on("creds.update", saveCreds);
 
-  // 📡 CONEXIÓN + QR
+  // 🔵 CONEXIÓN + QR
   sock.ev.on("connection.update", async (update) => {
     const { connection, qr } = update;
 
@@ -54,11 +53,10 @@ async function startBot() {
     }
   });
 
-  // 💬 MENSAJES (DEBUG + RESPUESTAS)
+  // 💬 MENSAJES (DEBUG REAL)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
 
-    // 🔴 DEBUG CLAVE
     console.log("🔥 MENSAJE RAW:", JSON.stringify(msg, null, 2));
 
     if (!msg.message || msg.key.fromMe) return;
