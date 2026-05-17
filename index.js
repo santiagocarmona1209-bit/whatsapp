@@ -18,7 +18,7 @@ async function startBot() {
 
   const sock = makeWASocket({
     auth: state,
-    printQRInTerminal: false
+    printQRInTerminal: false,
     browser: ["kali linux", "Chrome", "22.04.4"],
     connectTimeoutMs: 60000,
     defaultQueryTimeoutMs: 60000,
