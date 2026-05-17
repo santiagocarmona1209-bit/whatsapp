@@ -19,6 +19,10 @@ async function startBot() {
   const sock = makeWASocket({
     auth: state,
     printQRInTerminal: false
+    browser: ["kali linux", "Chrome", "22.04.4"],
+    connectTimeoutMs: 60000,
+    defaultQueryTimeoutMs: 60000,
+    retryRequestDelayMs: 2000
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -30,8 +34,16 @@ async function startBot() {
       qrImage = await QRCode.toDataURL(qr);
       console.log("QR actualizado");
     }
-  });
-}
+    
+  if (connection === "close") {
+    console.log("⚠️ Conexión cerrada, reconectando...");
+    startBot(); // 🔁 reconexión automática
+  }
+
+  if (connection === "open") {
+    console.log("✅ WhatsApp conectado");
+  }
+ });
 
 startBot();
 
